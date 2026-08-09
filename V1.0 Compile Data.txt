@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compile Match Tracker</title>
+    <!-- Sử dụng Tailwind CSS để giao diện tự động co giãn đẹp mắt trên điện thoại, iPad, PC -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-p-4">
+    <div class="max-w-4xl mx-auto p-4 sm:p-6">
+        <!-- Header -->
+        <header class="text-center mb-8 border-b border-slate-800 pb-4">
+            <h1 class="text-3xl font-black tracking-wider text-amber-400">COMPILE MATCH TRACKER</h1>
+            <p class="text-sm text-slate-400 mt-1">Hệ thống lưu trữ và thống kê dữ liệu trận đấu</p>
+        </header>
+
+        <!-- Form nhập trận đấu mới -->
+        <section class="bg-slate-900 border border-slate-800 rounded-xl p-4 sm:p-6 mb-8 shadow-xl">
+            <h2 class="text-xl font-bold mb-4 text-emerald-400">+ Ghi nhận trận đấu mới</h2>
+            <form id="matchForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs uppercase text-slate-400 mb-1">Người chơi 1 (Thắng/Thua)</label>
+                    <input type="text" id="p1Name" required placeholder="Tên P1" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white focus:outline-none focus:border-emerald-500">
+                    <input type="text" id="p1Protocols" required placeholder="3 Protocol (VD: Time, Chaos, Peace)" class="w-full mt-2 bg-slate-800 border border-slate-700 rounded p-2 text-white text-sm focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-xs uppercase text-slate-400 mb-1">Người chơi 2</label>
+                    <input type="text" id="p2Name" required placeholder="Tên P2" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white focus:outline-none focus:border-emerald-500">
+                    <input type="text" id="p2Protocols" required placeholder="3 Protocol (VD: Corruption, Clarity, Mirror)" class="w-full mt-2 bg-slate-800 border border-slate-700 rounded p-2 text-white text-sm focus:outline-none focus:border-emerald-500">
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="block text-xs uppercase text-slate-400 mb-1">Ai là người chiến thắng?</label>
+                    <select id="winner" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white focus:outline-none focus:border-emerald-500">
+                        <option value="p1">Người chơi 1 thắng</option>
+                        <option value="p2">Người chơi 2 thắng</option>
+                    </select>
+                </div>
+                <div class="sm:col-span-2">
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 font-bold py-2 px-4 rounded transition duration-200">Lưu Trận Đấu</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Khu vực Thống kê & Báo cáo -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <!-- Thống kê Người chơi -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-xl">
+                <h3 class="text-lg font-bold text-amber-400 mb-3 border-b border-slate-800 pb-2">Tỉ lệ thắng Người chơi</h3>
+                <div id="playerStats" class="space-y-2 text-sm text-slate-300">Chưa có dữ liệu.</div>
+            </div>
+            <!-- Thống kê Protocol -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-xl">
+                <h3 class="text-lg font-bold text-amber-400 mb-3 border-b border-slate-800 pb-2">Tỉ lệ thắng Protocol</h3>
+                <div id="protocolStats" class="space-y-2 text-sm text-slate-300">Chưa có dữ liệu.</div>
+            </div>
+        </section>
+
+        <!-- Lịch sử trận đấu -->
+        <section class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-xl">
+            <h3 class="text-lg font-bold text-sky-400 mb-3 border-b border-slate-800 pb-2">Lịch sử các trận đấu gần đây</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-slate-300">
+                    <thead class="bg-slate-800 text-xs uppercase text-slate-400">
+                        <tr>
+                            <th class="p-2">P1 (Protocol)</th>
+                            <th class="p-2">P2 (Protocol)</th>
+                            <th class="p-2">Người thắng</th>
+                            <th class="p-2 text-right">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="matchHistoryList">
+                        <tr><td colspan="4" class="p-4 text-center text-slate-500">Chưa có trận đấu nào được ghi nhận.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Lưu trữ dữ liệu mẫu trên LocalStorage (Sau này có thể nâng cấp kết nối Supabase để lưu online cho nhiều người cùng nhập)
+        let matches = JSON.parse(localStorage.getItem('compile_matches')) || [];
+
+        const form = document.getElementById('matchForm');
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const newMatch = {
+                id: Date.now(),
+                p1Name: document.getElementById('p1Name').value.trim(),
+                p1Protocols: document.getElementById('p1Protocols').value.split(',').map(s => s.trim()),
+                p2Name: document.getElementById('p2Name').value.trim(),
+                p2Protocols: document.getElementById('p2Protocols').value.split(',').map(s => s.trim()),
+                winner: document.getElementById('winner').value
+            };
+            matches.push(newMatch);
+            localStorage.setItem('compile_matches', JSON.stringify(matches));
+            form.reset();
+            renderApp();
+        });
+
+        function deleteMatch(id) {
+            matches = matches.filter(m => m.id !== id);
+            localStorage.setItem('compile_matches', JSON.stringify(matches));
+            renderApp();
+        }
+
+        function renderApp() {
+            const historyList = document.getElementById('matchHistoryList');
+            const playerStatsDiv = document.getElementById('playerStats');
+            const protocolStatsDiv = document.getElementById('protocolStats');
+
+            if (matches.length === 0) {
+                historyList.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500">Chưa có trận đấu nào được ghi nhận.</td></tr>`;
+                playerStatsDiv.innerHTML = `Chưa có dữ liệu.`;
+                protocolStatsDiv.innerHTML = `Chưa có dữ liệu.`;
+                return;
+            }
+
+            // Hiển thị lịch sử
+            historyList.innerHTML = matches.slice().reverse().map(m => `
+                <tr class="border-b border-slate-800 hover:bg-slate-800/50">
+                    <td class="p-2"><strong>${m.p1Name}</strong><br><span class="text-xs text-slate-400">[${m.p1Protocols.join(', ')}]</span></td>
+                    <td class="p-2"><strong>${m.p2Name}</strong><br><span class="text-xs text-slate-400">[${m.p2Protocols.join(', ')}]</span></td>
+                    <td class="p-2 font-bold text-emerald-400">${m.winner === 'p1' ? m.p1Name : m.p2Name}</td>
+                    <td class="p-2 text-right"><button onclick="deleteMatch(${m.id})" class="text-red-400 hover:text-red-300 text-xs bg-red-950/40 px-2 py-1 rounded border border-red-900">Xóa</button></td>
+                </tr>
+            `).join('');
+
+            // Thống kê người chơi
+            let playerRecords = {};
+            let protocolRecords = {};
+
+            matches.forEach(m => {
+                let p1 = m.p1Name;
+                let p2 = m.p2Name;
+                
+                if (!playerRecords[p1]) playerRecords[p1] = { win: 0, total: 0 };
+                if (!playerRecords[p2]) playerRecords[p2] = { win: 0, total: 0 };
+                
+                playerRecords[p1].total++;
+                playerRecords[p2].total++;
+
+                if (m.winner === 'p1') playerRecords[p1].win++;
+                else playerRecords[p2].win++;
+
+                // Thống kê Protocol
+                m.p1Protocols.forEach(proto => {
+                    if (!protocolRecords[proto]) protocolRecords[proto] = { win: 0, total: 0 };
+                    protocolRecords[proto].total++;
+                    if (m.winner === 'p1') protocolRecords[proto].win++;
+                });
+                m.p2Protocols.forEach(proto => {
+                    if (!protocolRecords[proto]) protocolRecords[proto] = { win: 0, total: 0 };
+                    protocolRecords[proto].total++;
+                    if (m.winner === 'p2') protocolRecords[proto].win++;
+                });
+            });
+
+            playerStatsDiv.innerHTML = Object.keys(playerRecords).map(player => {
+                let r = playerRecords[player];
+                let percent = ((r.win / r.total) * 100).toFixed(1);
+                return `<div class="flex justify-between items-center bg-slate-800/60 p-2 rounded mb-1">
+                    <span>${player}</span>
+                    <span class="text-xs font-mono"><strong class="text-emerald-400">${r.win}W</strong> / ${r.total}T (${percent}%)</span>
+                </div>`;
+            }).join('');
+
+            protocolStatsDiv.innerHTML = Object.keys(protocolRecords).map(proto => {
+                let r = protocolRecords[proto];
+                let percent = ((r.win / r.total) * 100).toFixed(1);
+                return `<div class="flex justify-between items-center bg-slate-800/60 p-2 rounded mb-1">
+                    <span class="capitalize text-amber-200">${proto}</span>
+                    <span class="text-xs font-mono"><strong class="text-emerald-400">${r.win}W</strong> / ${r.total}T (${percent}%)</span>
+                </div>`;
+            }).join('');
+        }
+
+        renderApp();
+    </script>
+</body>
+</html>
