@@ -12,13 +12,14 @@
         <header class="text-center mb-8 border-b border-slate-800 pb-4 relative">
             <h1 class="text-3xl font-black tracking-wider text-amber-400">COMPILE MATCH TRACKER</h1>
             <p class="text-sm text-slate-400 mt-1">Hệ thống lưu trữ và thống kê dữ liệu trận đấu</p>
-            <div class="mt-4">
-                <button onclick="switchView('main')" id="btnMain" class="px-4 py-2 bg-emerald-600 text-white font-bold rounded-lg text-sm mr-2 transition">Nhập trận & Thống kê</button>
-                <button onclick="switchView('history')" id="btnHistory" class="px-4 py-2 bg-slate-800 text-slate-300 font-bold rounded-lg text-sm transition hover:bg-slate-700">Xem lịch sử đấu</button>
+            <div class="mt-4 flex flex-wrap justify-center gap-2">
+                <button onclick="switchView('main')" id="btnMain" class="px-4 py-2 bg-emerald-600 text-white font-bold rounded-lg text-sm transition">Nhập trận đấu</button>
+                <button onclick="switchView('rankings')" id="btnRankings" class="px-4 py-2 bg-slate-800 text-slate-300 font-bold rounded-lg text-sm transition hover:bg-slate-700">Hệ thống game</button>
+                <button onclick="switchView('history')" id="btnHistory" class="px-4 py-2 bg-slate-800 text-slate-300 font-bold rounded-lg text-sm transition hover:bg-slate-700">Lịch sử đấu</button>
             </div>
         </header>
 
-        <!-- VIEW 1: MAIN & STATS -->
+        <!-- VIEW 1: NHẬP TRẬN & ĐỐI ĐẦU -->
         <div id="viewMain" class="space-y-8">
             <!-- Form nhập trận đấu mới -->
             <section class="bg-slate-900 border border-slate-800 rounded-xl p-4 sm:p-6 shadow-xl">
@@ -95,21 +96,42 @@
                     Hãy chọn 2 người chơi để xem thống kê đối đầu trực tiếp.
                 </div>
             </section>
+        </div>
 
-            <!-- Thống kê Tỉ lệ thắng Người chơi & Protocol -->
+        <!-- VIEW 2: HỆ THỐNG GAME (DANH SÁCH PROTOCOL, PLAYER, BẢNG XẾP HẠNG) -->
+        <div id="viewRankings" class="hidden space-y-6">
+            <!-- Quản lý Protocol -->
+            <section class="bg-slate-900 border border-slate-800 rounded-xl p-4 sm:p-6 shadow-xl">
+                <h3 class="text-lg font-bold text-amber-400 mb-3 border-b border-slate-800 pb-2">🧩 Danh sách Protocol & Thêm mới</h3>
+                <form id="protocolForm" class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4 bg-slate-800/40 p-3 rounded-lg">
+                    <input type="text" id="newProtoName" placeholder="Tên Protocol (VD: Life)" required class="bg-slate-800 border border-slate-700 rounded p-2 text-sm text-white">
+                    <input type="text" id="newProtoImg" placeholder="Link ảnh (URL hình thẻ)" class="bg-slate-800 border border-slate-700 rounded p-2 text-sm text-white">
+                    <input type="text" id="newProtoKeywords" placeholder="Từ khóa (VD: Flip, Top Deck, Draw)" required class="bg-slate-800 border border-slate-700 rounded p-2 text-sm text-white">
+                    <button type="submit" class="sm:col-span-3 bg-amber-600 hover:bg-amber-500 font-bold py-2 rounded text-sm transition">Thêm Protocol Mới</button>
+                </form>
+                <div id="protocolInventory" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
+            </section>
+
+            <!-- Danh sách Player & Thống kê cá nhân -->
+            <section class="bg-slate-900 border border-slate-800 rounded-xl p-4 sm:p-6 shadow-xl">
+                <h3 class="text-lg font-bold text-emerald-400 mb-3 border-b border-slate-800 pb-2">👥 Danh sách Player & Top Protocol hay dùng</h3>
+                <div id="playerInventoryList" class="space-y-3">Chưa có tuyển thủ nào.</div>
+            </section>
+
+            <!-- Bảng xếp hạng Tỉ lệ thắng -->
             <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-xl">
-                    <h3 class="text-lg font-bold text-amber-400 mb-3 border-b border-slate-800 pb-2">Tỉ lệ thắng Người chơi</h3>
+                    <h3 class="text-lg font-bold text-amber-400 mb-3 border-b border-slate-800 pb-2">🏆 Tỉ lệ thắng Người chơi</h3>
                     <div id="playerStats" class="space-y-2 text-sm text-slate-300">Chưa có dữ liệu.</div>
                 </div>
                 <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-xl">
-                    <h3 class="text-lg font-bold text-amber-400 mb-3 border-b border-slate-800 pb-2">Tỉ lệ thắng Protocol</h3>
+                    <h3 class="text-lg font-bold text-amber-400 mb-3 border-b border-slate-800 pb-2">📊 Tỉ lệ thắng Protocol</h3>
                     <div id="protocolStats" class="space-y-2 text-sm text-slate-300 max-h-60 overflow-y-auto">Chưa có dữ liệu.</div>
                 </div>
             </section>
         </div>
 
-        <!-- VIEW 2: LỊCH SỬ ĐẤU (BỊ ẨN SANG TRANG RIÊNG) -->
+        <!-- VIEW 3: LỊCH SỬ ĐẤU -->
         <div id="viewHistory" class="hidden space-y-4">
             <section class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-xl">
                 <h3 class="text-lg font-bold text-sky-400 mb-3 border-b border-slate-800 pb-2">📜 Lịch sử tất cả trận đấu</h3>
@@ -133,28 +155,89 @@
     </div>
 
     <script>
-        const ALL_PROTOCOLS = [
-            "Chaos", "Clarity", "Corruption", "Courage", "Fear", 
-            "Ice", "Mirror", "Peace", "Time", "War", "Darkness", "Light"
+        let defaultProtocols = [
+            { name: "Chaos", img: "", keywords: "Random, Shift" },
+            { name: "Clarity", img: "", keywords: "Reveal, Draw" },
+            { name: "Corruption", img: "", keywords: "Delete, Discard" },
+            { name: "Courage", img: "", keywords: "Value, Boost" },
+            { name: "Fear", img: "", keywords: "Cover, Lock" },
+            { name: "Ice", img: "", keywords: "Freeze, Control" },
+            { name: "Mirror", img: "", keywords: "Copy, Swap" },
+            { name: "Peace", img: "", keywords: "Heal, Protect" },
+            { name: "Time", img: "", keywords: "Discard, Trash" },
+            { name: "War", img: "", keywords: "Attack, Destroy" },
+            { name: "Darkness", img: "", keywords: "Hidden, Cover" },
+            { name: "Light", img: "", keywords: "Reveal, Uncover" },
+            { name: "Life", img: "", keywords: "Flip, Top Deck Play, Draw" }
         ];
 
+        let protocols = JSON.parse(localStorage.getItem('compile_protocols')) || defaultProtocols;
         let matches = JSON.parse(localStorage.getItem('compile_matches')) || [];
 
-        // Khởi tạo danh sách Protocol vào các dropdown
+        function saveProtocols() {
+            localStorage.setItem('compile_protocols', JSON.stringify(protocols));
+        }
+
         function initProtocolSelects() {
             const selects = document.querySelectorAll('.protocol-select');
             selects.forEach(sel => {
+                const curVal = sel.value;
                 sel.innerHTML = '<option value="">-- Chọn Protocol --</option>' + 
-                    ALL_PROTOCOLS.map(p => `<option value="${p}">${p}</option>`).join('');
+                    protocols.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
+                sel.value = curVal;
             });
 
             const banContainer = document.getElementById('banCheckboxes');
-            banContainer.innerHTML = ALL_PROTOCOLS.map(p => `
+            banContainer.innerHTML = protocols.map(p => `
                 <label class="flex items-center space-x-1.5 cursor-pointer bg-slate-800 p-1.5 rounded border border-slate-700">
-                    <input type="checkbox" value="${p}" class="ban-checkbox w-3.5 h-3.5 text-red-500 rounded bg-slate-900 border-slate-700" onchange="updateAvailableProtocols()">
-                    <span class="truncate">${p}</span>
+                    <input type="checkbox" value="${p.name}" class="ban-checkbox w-3.5 h-3.5 text-red-500 rounded bg-slate-900 border-slate-700" onchange="updateAvailableProtocols()">
+                    <span class="truncate">${p.name}</span>
                 </label>
             `).join('');
+
+            renderProtocolInventory();
+        }
+
+        function renderProtocolInventory() {
+            const container = document.getElementById('protocolInventory');
+            container.innerHTML = protocols.map((p, idx) => `
+                <div class="bg-slate-800/70 border border-slate-700 p-3 rounded-lg flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-1">
+                            <h4 class="font-bold text-amber-300 text-sm">${p.name}</h4>
+                            <button onclick="deleteProtocol(${idx})" class="text-red-400 hover:text-red-300 text-xs">Xóa</button>
+                        </div>
+                        <p class="text-xs text-slate-400 mb-2">Từ khóa: <span class="text-slate-200">${p.keywords}</span></p>
+                    </div>
+                    ${p.img ? `<img src="${p.img}" class="w-full h-24 object-cover rounded mt-2 border border-slate-700">` : '<div class="w-full h-16 bg-slate-900 rounded flex items-center justify-center text-xs text-slate-600">Không có ảnh</div>'}
+                </div>
+            `).join('');
+        }
+
+        const protoForm = document.getElementById('protocolForm');
+        protoForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('newProtoName').value.trim();
+            const img = document.getElementById('newProtoImg').value.trim();
+            const keywords = document.getElementById('newProtoKeywords').value.trim();
+
+            if(protocols.some(p => p.name.toLowerCase() === name.toLowerCase())) {
+                alert("Protocol này đã tồn tại!");
+                return;
+            }
+
+            protocols.push({ name, img, keywords });
+            saveProtocols();
+            protoForm.reset();
+            initProtocolSelects();
+        });
+
+        function deleteProtocol(idx) {
+            if(confirm("Bạn có chắc chắn muốn xóa protocol này?")) {
+                protocols.splice(idx, 1);
+                saveProtocols();
+                initProtocolSelects();
+            }
         }
 
         function toggleBanSection() {
@@ -171,14 +254,14 @@
 
         function updateAvailableProtocols() {
             const banned = Array.from(document.querySelectorAll('.ban-checkbox:checked')).map(cb => cb.value);
-            const available = ALL_PROTOCOLS.filter(p => !banned.includes(p));
+            const available = protocols.filter(p => !banned.includes(p.name));
 
             const selects = document.querySelectorAll('.protocol-select');
             selects.forEach(sel => {
                 const currentValue = sel.value;
                 sel.innerHTML = '<option value="">-- Chọn Protocol --</option>' + 
-                    available.map(p => `<option value="${p}">${p}</option>`).join('');
-                if (available.includes(currentValue)) {
+                    available.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
+                if (available.some(p => p.name === currentValue)) {
                     sel.value = currentValue;
                 }
             });
@@ -186,26 +269,37 @@
 
         function switchView(view) {
             const viewMain = document.getElementById('viewMain');
+            const viewRankings = document.getElementById('viewRankings');
             const viewHistory = document.getElementById('viewHistory');
+            
             const btnMain = document.getElementById('btnMain');
+            const btnRankings = document.getElementById('btnRankings');
             const btnHistory = document.getElementById('btnHistory');
+
+            viewMain.classList.add('hidden');
+            viewRankings.classList.add('hidden');
+            viewHistory.classList.add('hidden');
+
+            btnMain.className = "px-4 py-2 bg-slate-800 text-slate-300 font-bold rounded-lg text-sm transition hover:bg-slate-700";
+            btnRankings.className = "px-4 py-2 bg-slate-800 text-slate-300 font-bold rounded-lg text-sm transition hover:bg-slate-700";
+            btnHistory.className = "px-4 py-2 bg-slate-800 text-slate-300 font-bold rounded-lg text-sm transition hover:bg-slate-700";
 
             if (view === 'main') {
                 viewMain.classList.remove('hidden');
-                viewHistory.classList.add('hidden');
-                btnMain.className = "px-4 py-2 bg-emerald-600 text-white font-bold rounded-lg text-sm mr-2 transition";
-                btnHistory.className = "px-4 py-2 bg-slate-800 text-slate-300 font-bold rounded-lg text-sm transition hover:bg-slate-700";
-            } else {
-                viewMain.classList.add('hidden');
+                btnMain.className = "px-4 py-2 bg-emerald-600 text-white font-bold rounded-lg text-sm transition";
+            } else if (view === 'rankings') {
+                viewRankings.classList.remove('hidden');
+                btnRankings.className = "px-4 py-2 bg-emerald-600 text-white font-bold rounded-lg text-sm transition";
+                renderRankingsAndPlayers();
+            } else if (view === 'history') {
                 viewHistory.classList.remove('hidden');
-                btnHistory.className = "px-4 py-2 bg-emerald-600 text-white font-bold rounded-lg text-sm mr-2 transition";
-                btnMain.className = "px-4 py-2 bg-slate-800 text-slate-300 font-bold rounded-lg text-sm transition hover:bg-slate-700";
+                btnHistory.className = "px-4 py-2 bg-emerald-600 text-white font-bold rounded-lg text-sm transition";
                 renderHistory();
             }
         }
 
-        const form = document.getElementById('matchForm');
-        form.addEventListener('submit', function(e) {
+        const matchForm = document.getElementById('matchForm');
+        matchForm.addEventListener('submit', function(e) {
             e.preventDefault();
             const p1Protocols = [
                 document.getElementById('p1Proto1').value,
@@ -218,7 +312,6 @@
                 document.getElementById('p2Proto3').value
             ];
 
-            // Kiểm tra trùng lặp protocol trong cùng 1 người chơi
             if (new Set(p1Protocols).size !== 3 || new Set(p2Protocols).size !== 3) {
                 alert("Mỗi người chơi phải chọn 3 Protocol khác nhau!");
                 return;
@@ -235,7 +328,7 @@
 
             matches.push(newMatch);
             localStorage.setItem('compile_matches', JSON.stringify(matches));
-            form.reset();
+            matchForm.reset();
             if(document.getElementById('enableBan').checked) {
                 document.getElementById('enableBan').checked = false;
                 toggleBanSection();
@@ -281,7 +374,6 @@
             });
 
             let playerList = Array.from(players);
-            
             let curA = pA.value;
             let curB = pB.value;
 
@@ -350,19 +442,21 @@
             `;
         }
 
-        function renderApp() {
+        function renderRankingsAndPlayers() {
             const playerStatsDiv = document.getElementById('playerStats');
             const protocolStatsDiv = document.getElementById('protocolStats');
+            const playerInventoryList = document.getElementById('playerInventoryList');
 
             if (matches.length === 0) {
                 playerStatsDiv.innerHTML = `Chưa có dữ liệu.`;
                 protocolStatsDiv.innerHTML = `Chưa có dữ liệu.`;
-                updatePlayerDropdowns();
+                playerInventoryList.innerHTML = `Chưa có tuyển thủ nào tham gia trận đấu.`;
                 return;
             }
 
             let playerRecords = {};
             let protocolRecords = {};
+            let playerProtocolsCount = {};
 
             matches.forEach(m => {
                 let p1 = m.p1Name;
@@ -370,6 +464,8 @@
                 
                 if (!playerRecords[p1]) playerRecords[p1] = { win: 0, total: 0 };
                 if (!playerRecords[p2]) playerRecords[p2] = { win: 0, total: 0 };
+                if (!playerProtocolsCount[p1]) playerProtocolsCount[p1] = {};
+                if (!playerProtocolsCount[p2]) playerProtocolsCount[p2] = {};
                 
                 playerRecords[p1].total++;
                 playerRecords[p2].total++;
@@ -381,14 +477,20 @@
                     if (!protocolRecords[proto]) protocolRecords[proto] = { win: 0, total: 0 };
                     protocolRecords[proto].total++;
                     if (m.winner === 'p1') protocolRecords[proto].win++;
+
+                    playerProtocolsCount[p1][proto] = (playerProtocolsCount[p1][proto] || 0) + 1;
                 });
+
                 m.p2Protocols.forEach(proto => {
                     if (!protocolRecords[proto]) protocolRecords[proto] = { win: 0, total: 0 };
                     protocolRecords[proto].total++;
                     if (m.winner === 'p2') protocolRecords[proto].win++;
+
+                    playerProtocolsCount[p2][proto] = (playerProtocolsCount[p2][proto] || 0) + 1;
                 });
             });
 
+            // Render Player Stats
             playerStatsDiv.innerHTML = Object.keys(playerRecords).map(player => {
                 let r = playerRecords[player];
                 let percent = ((r.win / r.total) * 100).toFixed(1);
@@ -398,6 +500,7 @@
                 </div>`;
             }).join('');
 
+            // Render Protocol Stats
             protocolStatsDiv.innerHTML = Object.keys(protocolRecords).map(proto => {
                 let r = protocolRecords[proto];
                 let percent = ((r.win / r.total) * 100).toFixed(1);
@@ -407,6 +510,27 @@
                 </div>`;
             }).join('');
 
+            // Render Player Inventory (Top 3 protocols)
+            playerInventoryList.innerHTML = Object.keys(playerRecords).map(player => {
+                let r = playerRecords[player];
+                let percent = ((r.win / r.total) * 100).toFixed(1);
+                
+                let sortedProtos = Object.entries(playerProtocolsCount[player] || {})
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 3)
+                    .map(item => `<span class="bg-slate-700 text-amber-300 text-xs px-2 py-0.5 rounded">${item[0]} (${item[1]} lần)</span>`)
+                    .join(' ');
+
+                return `<div class="bg-slate-800/60 p-3 rounded-lg border border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                    <div>
+                        <div class="font-bold text-white">${player} <span class="text-xs font-normal text-emerald-400 ml-2">(${r.win} thắng / ${r.total} trận - ${percent}%)</span></div>
+                        <div class="text-xs text-slate-400 mt-1 flex flex-wrap items-center gap-1">Top 3 Protocol hay dùng: ${sortedProtos || 'Chưa có dữ liệu'}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function renderApp() {
             updatePlayerDropdowns();
         }
 
