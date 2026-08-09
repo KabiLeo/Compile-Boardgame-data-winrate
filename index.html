@@ -102,12 +102,16 @@
         <div id="viewRankings" class="hidden space-y-6">
             <!-- Quản lý Protocol -->
             <section class="bg-slate-900 border border-slate-800 rounded-xl p-4 sm:p-6 shadow-xl">
-                <h3 class="text-lg font-bold text-amber-400 mb-3 border-b border-slate-800 pb-2">🧩 Danh sách Protocol & Thêm mới</h3>
+                <h3 id="formProtocolTitle" class="text-lg font-bold text-amber-400 mb-3 border-b border-slate-800 pb-2">🧩 Thêm / Chỉnh sửa Protocol</h3>
                 <form id="protocolForm" class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4 bg-slate-800/40 p-3 rounded-lg">
+                    <input type="hidden" id="editProtocolIndex" value="-1">
                     <input type="text" id="newProtoName" placeholder="Tên Protocol (VD: Life)" required class="bg-slate-800 border border-slate-700 rounded p-2 text-sm text-white">
                     <input type="text" id="newProtoImg" placeholder="Link ảnh (URL hình thẻ)" class="bg-slate-800 border border-slate-700 rounded p-2 text-sm text-white">
                     <input type="text" id="newProtoKeywords" placeholder="Từ khóa (VD: Flip, Top Deck, Draw)" required class="bg-slate-800 border border-slate-700 rounded p-2 text-sm text-white">
-                    <button type="submit" class="sm:col-span-3 bg-amber-600 hover:bg-amber-500 font-bold py-2 rounded text-sm transition">Thêm Protocol Mới</button>
+                    <div class="sm:col-span-3 flex gap-2">
+                        <button type="submit" id="btnSubmitProto" class="flex-1 bg-amber-600 hover:bg-amber-500 font-bold py-2 rounded text-sm transition">Thêm Protocol Mới</button>
+                        <button type="button" id="btnCancelEdit" onclick="resetProtocolForm()" class="hidden px-4 bg-slate-700 hover:bg-slate-600 font-bold rounded text-sm transition">Hủy</button>
+                    </div>
                 </form>
                 <div id="protocolInventory" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
             </section>
@@ -205,7 +209,10 @@
                     <div>
                         <div class="flex justify-between items-start mb-1">
                             <h4 class="font-bold text-amber-300 text-sm">${p.name}</h4>
-                            <button onclick="deleteProtocol(${idx})" class="text-red-400 hover:text-red-300 text-xs">Xóa</button>
+                            <div class="space-x-1">
+                                <button onclick="editProtocol(${idx})" class="text-sky-400 hover:text-sky-300 text-xs">Sửa</button>
+                                <button onclick="deleteProtocol(${idx})" class="text-red-400 hover:text-red-300 text-xs">Xóa</button>
+                            </div>
                         </div>
                         <p class="text-xs text-slate-400 mb-2">Từ khóa: <span class="text-slate-200">${p.keywords}</span></p>
                     </div>
@@ -214,21 +221,52 @@
             `).join('');
         }
 
+        function editProtocol(idx) {
+            const p = protocols[idx];
+            document.getElementById('editProtocolIndex').value = idx;
+            document.getElementById('newProtoName').value = p.name;
+            document.getElementById('newProtoImg').value = p.img;
+            document.getElementById('newProtoKeywords').value = p.keywords;
+
+            document.getElementById('btnSubmitProto').textContent = "Cập nhật Protocol";
+            document.getElementById('btnCancelEdit').classList.remove('hidden');
+            document.getElementById('formProtocolTitle').textContent = `🧩 Chỉnh sửa Protocol: ${p.name}`;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetProtocolForm() {
+            document.getElementById('protocolForm').reset();
+            document.getElementById('editProtocolIndex').value = "-1";
+            document.getElementById('btnSubmitProto').textContent = "Thêm Protocol Mới";
+            document.getElementById('btnCancelEdit').classList.add('hidden');
+            document.getElementById('formProtocolTitle').textContent = "🧩 Thêm / Chỉnh sửa Protocol";
+        }
+
         const protoForm = document.getElementById('protocolForm');
         protoForm.addEventListener('submit', function(e) {
             e.preventDefault();
+            const editIdx = parseInt(document.getElementById('editProtocolIndex').value);
             const name = document.getElementById('newProtoName').value.trim();
             const img = document.getElementById('newProtoImg').value.trim();
             const keywords = document.getElementById('newProtoKeywords').value.trim();
 
-            if(protocols.some(p => p.name.toLowerCase() === name.toLowerCase())) {
-                alert("Protocol này đã tồn tại!");
-                return;
+            if (editIdx === -1) {
+                if(protocols.some(p => p.name.toLowerCase() === name.toLowerCase())) {
+                    alert("Protocol này đã tồn tại!");
+                    return;
+                }
+                protocols.push({ name, img, keywords });
+            } else {
+                // Kiểm tra trùng tên nếu đổi tên khác với tên cũ
+                if(protocols.some((p, i) => i !== editIdx && p.name.toLowerCase() === name.toLowerCase())) {
+                    alert("Tên Protocol này đã tồn tại ở mục khác!");
+                    return;
+                }
+                protocols[editIdx] = { name, img, keywords };
             }
 
-            protocols.push({ name, img, keywords });
             saveProtocols();
-            protoForm.reset();
+            resetProtocolForm();
             initProtocolSelects();
         });
 
