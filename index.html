@@ -11,12 +11,11 @@
         <!-- Header -->
         <header class="text-center mb-8 border-b border-slate-800 pb-4 relative">
             <h1 class="text-3xl font-black tracking-wider text-amber-400">COMPILE MATCH TRACKER</h1>
-            <p class="text-sm text-slate-400 mt-1">Hệ thống lưu trữ và thống kê dữ liệu trận đấu</p>
+            <p class="text-sm text-slate-400 mt-1">Hệ thống lưu trữ và thống kê dữ liệu trận đấu (Cloud Sync)</p>
             
-            <!-- Nút Đồng bộ dữ liệu đám mây -->
             <div class="mt-3 flex justify-center items-center gap-2">
-                <button onclick="syncData()" id="syncBtn" class="px-3 py-1 bg-sky-700 hover:bg-sky-600 text-white text-xs font-bold rounded shadow transition flex items-center gap-1">
-                    🔄 Đồng bộ dữ liệu
+                <button onclick="syncDataFromCloud()" id="syncBtn" class="px-3 py-1 bg-sky-700 hover:bg-sky-600 text-white text-xs font-bold rounded shadow transition flex items-center gap-1">
+                    🔄 Đồng bộ từ Cloud
                 </button>
             </div>
 
@@ -29,7 +28,6 @@
 
         <!-- VIEW 1: NHẬP TRẬN & ĐỐI ĐẦU -->
         <div id="viewMain" class="space-y-8">
-            <!-- Form nhập trận đấu mới -->
             <section class="bg-slate-900 border border-slate-800 rounded-xl p-4 sm:p-6 shadow-xl">
                 <h2 class="text-xl font-bold mb-4 text-emerald-400">+ Ghi nhận trận đấu mới</h2>
                 <form id="matchForm" class="space-y-4">
@@ -83,7 +81,6 @@
                 </form>
             </section>
 
-            <!-- Phần tra cứu Tỉ lệ thắng cặp đấu -->
             <section class="bg-slate-900 border border-slate-800 rounded-xl p-4 sm:p-6 shadow-xl">
                 <h3 class="text-lg font-bold text-sky-400 mb-3 border-b border-slate-800 pb-2">⚔️ Kiểm tra tỉ lệ thắng cặp đấu trực tiếp</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
@@ -164,9 +161,8 @@
     </div>
 
     <script>
-        // Cấu hình Cloud Storage công khai miễn phí qua JSONBin
-        const BIN_ID = "6612b793ae38cf3077e5e33d"; // Public storage bin
-        const API_KEY = "$2a$10$w8W7h4R6q0P5x3x9V8uL1e6K3vV8n2Z6q0P5x3x9V8uL1e6K3vV8n"; // Free public key placeholder
+        // DÁN ĐƯỜNG DẪN WEB APP URL CỦA GOOGLE APPS SCRIPT VÀO ĐÂY:
+        const API_URL = "https://script.google.com/macros/s/AKfycbxSETLNJdUKvWBHsNKx2DaEQnetxnEToQBg2JAFqmDRfWBQuK6dRBn1oFN34VxqiHF-/exec";
 
         let defaultProtocols = [
             { name: "Chaos", img: "", keywords: "Random, Shift" },
@@ -187,32 +183,43 @@
         let protocols = JSON.parse(localStorage.getItem('compile_protocols')) || defaultProtocols;
         let matches = JSON.parse(localStorage.getItem('compile_matches')) || [];
 
-        // Đồng bộ dữ liệu từ cloud
-        async function syncData() {
+        async function syncDataFromCloud() {
             const btn = document.getElementById('syncBtn');
-            btn.textContent = "⏳ Đang đồng bộ...";
+            btn.textContent = "⏳ Đang tải...";
             try {
-                // Tải dữ liệu mới nhất
-                let res = await fetch(`https://api.jsonbin.io/v3/b/65f1234bde57e84459f81234/latest`, {
-                    headers: { 'X-Master-Key': '$2a$10$NotArealKeyForDemoPurposeOnly00000000000000000000000' }
-                });
-                // Nếu dùng localStorage chuyên sâu multi-device, dùng cách lưu chung JSONBin công khai hoặc qua cơ chế lưu trực tiếp
-                // Tạm thời kích hoạt đồng bộ qua LocalStorage nâng cao và đẩy thông báo
-                alert("Đã kết nối và đồng bộ cơ sở dữ liệu thành công!");
+                let response = await fetch(API_URL);
+                let data = await response.json();
+                if (data && data.protocols && data.matches) {
+                    protocols = data.protocols;
+                    matches = data.matches;
+                    localStorage.setItem('compile_protocols', JSON.stringify(protocols));
+                    localStorage.setItem('compile_matches', JSON.stringify(matches));
+                    initProtocolSelects();
+                    renderApp();
+                    alert("Đồng bộ dữ liệu từ Cloud thành công!");
+                }
             } catch (e) {
-                // Fallback lưu trực tiếp localStorage làm bộ đệm chính
-                localStorage.setItem('compile_protocols', JSON.stringify(protocols));
-                localStorage.setItem('compile_matches', JSON.stringify(matches));
-                alert("Dữ liệu đã được lưu trữ an toàn trên thiết bị này!");
+                alert("Không thể kết nối Cloud. Đang dùng dữ liệu trên máy.");
             }
-            btn.textContent = "🔄 Đồng bộ dữ liệu";
-            initProtocolSelects();
-            renderApp();
+            btn.textContent = "🔄 Đồng bộ từ Cloud";
         }
 
-        function saveData() {
+        async function saveDataToCloud() {
             localStorage.setItem('compile_protocols', JSON.stringify(protocols));
             localStorage.setItem('compile_matches', JSON.stringify(matches));
+            
+            if (API_URL.includes("macros/s/")) {
+                try {
+                    await fetch(API_URL, {
+                        method: "POST",
+                        mode: "no-cors",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ protocols: protocols, matches: matches })
+                    });
+                } catch (e) {
+                    console.log("Lỗi lưu cloud tự động");
+                }
+            }
         }
 
         function getSortedProtocols() {
@@ -221,7 +228,6 @@
 
         function initProtocolSelects() {
             updateProtocolOptions();
-            
             const sorted = getSortedProtocols();
             const banContainer = document.getElementById('banCheckboxes');
             banContainer.innerHTML = sorted.map(p => `
@@ -230,17 +236,13 @@
                     <span class="truncate">${p.name}</span>
                 </label>
             `).join('');
-
             renderProtocolInventory();
         }
 
         function updateProtocolOptions() {
             const banned = Array.from(document.querySelectorAll('.ban-checkbox:checked')).map(cb => cb.value);
             const sorted = getSortedProtocols().filter(p => !banned.includes(p.name));
-
-            // Cập nhật cho P1
             updateGroupOptions('p1', sorted);
-            // Cập nhật cho P2
             updateGroupOptions('p2', sorted);
         }
 
@@ -250,17 +252,13 @@
                 document.getElementById(`${prefix}Proto2`),
                 document.getElementById(`${prefix}Proto3`)
             ];
-
             let selectedValues = selects.map(s => s.value);
-
             selects.forEach((sel, idx) => {
                 let currentVal = sel.value;
                 let otherSelected = selectedValues.filter((val, i) => i !== idx && val !== "");
                 let filtered = availableList.filter(p => !otherSelected.includes(p.name));
-
                 sel.innerHTML = '<option value="">-- Chọn Protocol --</option>' + 
                     filtered.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
-
                 if (filtered.some(p => p.name === currentVal)) {
                     sel.value = currentVal;
                 } else {
@@ -320,7 +318,6 @@
             document.getElementById('newProtoName').value = p.name;
             document.getElementById('newProtoImg').value = p.img;
             document.getElementById('newProtoKeywords').value = p.keywords;
-
             document.getElementById('btnSubmitProto').textContent = "Cập nhật Protocol";
             document.getElementById('btnCancelEdit').classList.remove('hidden');
             document.getElementById('formProtocolTitle').textContent = `🧩 Chỉnh sửa Protocol: ${p.name}`;
@@ -357,15 +354,16 @@
                 protocols[editIdx] = { name, img, keywords };
             }
 
-            saveData();
+            saveDataToCloud();
             resetProtocolForm();
             initProtocolSelects();
+            alert("Đã lưu Protocol thành công lên Cloud!");
         });
 
         function deleteProtocol(idx) {
             if(confirm("Bạn có chắc chắn muốn xóa protocol này?")) {
                 protocols.splice(idx, 1);
-                saveData();
+                saveDataToCloud();
                 initProtocolSelects();
             }
         }
@@ -440,7 +438,7 @@
             };
 
             matches.push(newMatch);
-            saveData();
+            saveDataToCloud();
             matchForm.reset();
             document.getElementById('selectedWinner').value = "";
             document.getElementById('p1Card').className = "bg-slate-800/50 p-4 rounded-lg border border-slate-700/50 transition-all";
@@ -454,13 +452,13 @@
             }
             initProtocolSelects();
             renderApp();
-            alert("Đã lưu trận đấu thành công!");
+            alert("Đã lưu trận đấu thành công lên Cloud!");
         });
 
         function deleteMatch(id) {
             if(confirm("Bạn có chắc chắn muốn xóa trận đấu này không?")) {
                 matches = matches.filter(m => m.id !== id);
-                saveData();
+                saveDataToCloud();
                 renderApp();
             }
         }
@@ -648,8 +646,8 @@
             updatePlayerDropdowns();
         }
 
-        initProtocolSelects();
-        renderApp();
+        // Tự động đồng bộ ngay khi mở web
+        syncDataFromCloud();
     </script>
 </body>
 </html>
