@@ -29,7 +29,7 @@
         <!-- VIEW 1: NHẬP TRẬN & ĐỐI ĐẦU -->
         <div id="viewMain" class="space-y-8">
             <section class="bg-slate-900 border border-slate-800 rounded-xl p-4 sm:p-6 shadow-xl">
-                <h2 class="text-xl font-bold mb-4 text-emerald-400">+ Ghi nhận trận đấu mới</h2>
+                    <h2 class="text-xl font-bold mb-4 text-emerald-400">NEW MATCH</h2>
                 
             
 
@@ -267,12 +267,12 @@
             if (currentStage === 'ban') {
                 banStatus.classList.remove('hidden');
                 bannedArea.classList.add('hidden');
-                title.textContent = "Giai đoạn 1: BAN Protocol";
+                title.textContent = "PHASE 1: BAN Protocol";
                 document.getElementById('banCount').textContent = bannedProtocols.length;
                 
                 btnConfirm.disabled = false;
                 btnConfirm.className = "px-6 py-2.5 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg text-sm transition cursor-pointer shadow-lg";
-                btnConfirm.textContent = "XÁC NHẬN BAN";
+                btnConfirm.textContent = "CONFIRM BANLIST";
             } else {
                 banStatus.classList.add('hidden');
                 if (bannedProtocols.length > 0) {
@@ -284,12 +284,12 @@
                     bannedArea.classList.add('hidden');
                 }
 
-                title.textContent = `Giai đoạn 2: PICK Protocol (P1: ${p1Picked.length}/3 | P2: ${p2Picked.length}/3)`;
+                title.textContent = `PHASE 2: PICK Protocol (P1: ${p1Picked.length}/3 | P2: ${p2Picked.length}/3)`;
                 
                 if (p1Picked.length === 3 && p2Picked.length === 3) {
                     btnConfirm.disabled = false;
                     btnConfirm.className = "px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-sm transition cursor-pointer shadow-lg animate-pulse";
-                    btnConfirm.textContent = "Xóa/Khóa Protocol đã chọn & Tiến hành nhập tên Player";
+                    btnConfirm.textContent = "CONFIRM PICK";
                 } else {
                     btnConfirm.disabled = true;
                     btnConfirm.className = "px-6 py-2.5 bg-slate-700 text-slate-400 font-bold rounded-lg text-sm transition cursor-not-allowed";
