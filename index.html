@@ -273,12 +273,12 @@
             if (currentStage === 'ban') {
                 banStatus.classList.remove('hidden');
                 bannedArea.classList.add('hidden');
-                title.textContent = "Giai đoạn 1: Nhấp thẻ để BÁN (Cấm) Protocol";
+                title.textContent = "Giai đoạn 1: BAN Protocol";
                 document.getElementById('banCount').textContent = bannedProtocols.length;
                 
                 btnConfirm.disabled = false;
                 btnConfirm.className = "px-6 py-2.5 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg text-sm transition cursor-pointer shadow-lg";
-                btnConfirm.textContent = "Xác nhận danh sách Ban & Sang Giai đoạn chọn";
+                btnConfirm.textContent = "XÁC NHẬN BAN";
             } else {
                 banStatus.classList.add('hidden');
                 if (bannedProtocols.length > 0) {
@@ -290,7 +290,7 @@
                     bannedArea.classList.add('hidden');
                 }
 
-                title.textContent = `Giai đoạn 2: Chọn Protocol (P1: ${p1Picked.length}/3 | P2: ${p2Picked.length}/3)`;
+                title.textContent = `Giai đoạn 2: PICK Protocol (P1: ${p1Picked.length}/3 | P2: ${p2Picked.length}/3)`;
                 
                 if (p1Picked.length === 3 && p2Picked.length === 3) {
                     btnConfirm.disabled = false;
