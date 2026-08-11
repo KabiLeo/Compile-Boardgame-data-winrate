@@ -29,9 +29,7 @@
         <!-- VIEW 1: NHẬP TRẬN & ĐỐI ĐẦU -->
         <div id="viewMain" class="space-y-8">
             <section class="bg-slate-900 border border-slate-800 rounded-xl p-4 sm:p-6 shadow-xl">
-                    <h2 class="text-xl font-bold mb-4 text-emerald-400">NEW MATCH</h2>
-                
-            
+                <h2 class="text-xl font-bold mb-4 text-emerald-400">NEW MATCH</h2>
 
                 <!-- KHU VỰC CHỌN THẺ PROTOCOL -->
                 <div class="mb-6 bg-slate-950 p-4 rounded-xl border border-slate-800">
@@ -196,8 +194,7 @@
         let protocols = JSON.parse(localStorage.getItem('compile_protocols')) || defaultProtocols;
         let matches = JSON.parse(localStorage.getItem('compile_matches')) || [];
 
-        // Trạng thái chọn thẻ card hiện tại
-        let currentStage = 'ban'; // 'ban' hoặc 'pick'
+        let currentStage = 'ban';
         let bannedProtocols = [];
         let p1Picked = [];
         let p2Picked = [];
@@ -311,7 +308,7 @@
                 } else if (currentStage === 'pick') {
                     if (isBanned) {
                         borderClass = "border-red-900/40 opacity-30 grayscale cursor-not-allowed";
-                            badgeHTML = `<div class="absolute inset-0 bg-slate-950/40 flex items-center justify-center"><span class="text-red-400 text-xs font-bold uppercase">BANNED</span></div>`;
+                        badgeHTML = `<div class="absolute inset-0 bg-slate-950/40 flex items-center justify-center"><span class="text-red-400 text-xs font-bold uppercase">BANNED</span></div>`;
                     } else if (isP1) {
                         borderClass = "border-emerald-500 ring-2 ring-emerald-500 shadow-lg shadow-emerald-950";
                         badgeHTML = `<div class="absolute top-2 right-2 bg-emerald-600 text-white text-xs font-bold px-2 py-0.5 rounded shadow">P1</div>`;
@@ -343,10 +340,8 @@
                 }
                 renderProtocolGrid();
             } else {
-                // Kiểm tra nếu bị ban thì không cho bấm
                 if (bannedProtocols.includes(name)) return;
 
-                // Quy chế click: Nhấp 1 lần P1 -> Nhấp lần 2 P2 -> Nhấp lần 3 Hủy
                 if (p1Picked.includes(name)) {
                     p1Picked = p1Picked.filter(item => item !== name);
                     p2Picked.push(name);
@@ -374,7 +369,6 @@
                     alert("Chưa đủ 3 thẻ cho mỗi Player!");
                     return;
                 }
-                // Khóa khu vực chọn thẻ, hiển thị form nhập tên player và nút win
                 document.getElementById('protocolCardGrid').classList.add('opacity-50', 'pointer-events-none');
                 document.getElementById('btnConfirmPick').classList.add('hidden');
                 document.getElementById('pickStageTitle').innerHTML = `✅ Đã khoá Protocol thành công!`;
@@ -419,7 +413,6 @@
             }
         }
 
-        // Render Protocol Inventory trong trang Hệ thống game
         function renderProtocolInventory() {
             const container = document.getElementById('protocolInventory');
             container.innerHTML = getSortedProtocols().map((p) => {
@@ -523,64 +516,58 @@
             }
         }
 
+        function resetAllStates() {
+            p1Picked = [];
+            p2Picked = [];
+            bannedProtocols = [];
+            currentStage = 'ban';
+            
+            const form = document.getElementById('matchForm');
+            form.reset();
+            document.getElementById('selectedWinner').value = "";
+            document.getElementById('enableBan').checked = false;
+            
+            document.getElementById('p1PickedTags').innerHTML = "";
+            document.getElementById('p2PickedTags').innerHTML = "";
+            
+            document.getElementById('p1Card').className = "bg-slate-800/50 p-4 rounded-lg border border-slate-700/50 transition-all";
+            document.getElementById('p2Card').className = "bg-slate-800/50 p-4 rounded-lg border border-slate-700/50 transition-all";
+            document.getElementById('btnWinP1').textContent = "P1 WIN";
+            document.getElementById('btnWinP2').textContent = "P2 WIN";
+            
+            const grid = document.getElementById('protocolCardGrid');
+            grid.classList.remove('hidden', 'opacity-50', 'pointer-events-none');
+            document.getElementById('btnConfirmPick').classList.remove('hidden');
+            form.classList.add('hidden');
+            
+            renderProtocolGrid();
+        }
+
         const matchForm = document.getElementById('matchForm');
- function resetAllStates() {
-    p1Picked = [];
-    p2Picked = [];
-    bannedProtocols = [];
-    
-    // Reset các trường nhập liệu và trạng thái form
-    matchForm.reset();
-    document.getElementById('selectedWinner').value = "";
-    document.getElementById('p1Name').value = "";
-    document.getElementById('p2Name').value = "";
-    document.getElementById('enableBan').checked = false;
-    currentStage = 'ban';
-    
-    // Reset tiêu đề và thẻ tag đã chọn
-    document.getElementById('pickStageTitle').textContent = "Giai đoạn: Chọn Protocol (P1: 0/3 | P2: 0/3)";
-    document.getElementById('p1PickedTags').innerHTML = "";
-    document.getElementById('p2PickedTags').innerHTML = "";
-    
-    // Reset giao diện khung P1 / P2
-    document.getElementById('p1Card').className = "bg-slate-800/50 p-4 rounded-lg border border-slate-700/50 transition-all";
-    document.getElementById('p2Card').className = "bg-slate-800/50 p-4 rounded-lg border border-slate-700/50 transition-all";
-    document.getElementById('btnWinP1').textContent = "P1 WIN";
-    document.getElementById('btnWinP2').textContent = "P2 WIN";
-    
-    // Mở khóa lưới thẻ bài, hiện lại nút xác nhận và ẩn form nhập tên đi
-    const grid = document.getElementById('protocolCardGrid');
-    grid.classList.remove('hidden', 'opacity-50', 'pointer-events-none');
-    document.getElementById('btnConfirmPick').classList.remove('hidden');
-    document.getElementById('matchForm').classList.add('hidden');
-    
-    renderProtocolGrid();
-}
-matchForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    const winner = document.getElementById('selectedWinner').value;
-    if(!winner) {
-        alert("Vui lòng bấm chọn người chiến thắng trước khi lưu trận đấu!");
-        return;
-    }
+        matchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const winner = document.getElementById('selectedWinner').value;
+            if(!winner) {
+                alert("Vui lòng bấm chọn người chiến thắng trước khi lưu trận đấu!");
+                return;
+            }
 
-    const newMatch = {
-        id: Date.now(),
-        p1Name: document.getElementById('p1Name').value.trim(),
-        p1Protocols: p1Picked,
-        p2Name: document.getElementById('p2Name').value.trim(),
-        p2Protocols: p2Picked,
-        winner: winner
-    };
+            const newMatch = {
+                id: Date.now(),
+                p1Name: document.getElementById('p1Name').value.trim(),
+                p1Protocols: p1Picked,
+                p2Name: document.getElementById('p2Name').value.trim(),
+                p2Protocols: p2Picked,
+                winner: winner
+            };
 
-    matches.push(newMatch);
-    saveDataToCloud();
-    alert("Đã lưu trận đấu thành công lên Cloud!");
-    
-    // Gọi hàm reset toàn bộ trạng thái để quay về bước Ban/Pick
-    resetAllStates();
-    renderApp();
-});
+            matches.push(newMatch);
+            saveDataToCloud();
+            alert("Đã lưu trận đấu thành công lên Cloud!");
+            
+            resetAllStates();
+            renderApp();
+        });
 
         function deleteMatch(id) {
             if(confirm("Bạn có chắc chắn muốn xóa trận đấu này không?")) {
@@ -773,7 +760,6 @@ matchForm.addEventListener('submit', function(e) {
             updatePlayerDropdowns();
         }
 
-        // Khởi chạy hệ thống thẻ khi mở trang
         renderProtocolGrid();
         syncDataFromCloud();
     </script>
