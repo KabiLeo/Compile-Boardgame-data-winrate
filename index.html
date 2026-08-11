@@ -524,23 +524,33 @@
         }
 
         const matchForm = document.getElementById('matchForm');
-        function resetAllStates() {
+ function resetAllStates() {
     p1Picked = [];
     p2Picked = [];
     bannedProtocols = [];
+    
+    // Reset các trường nhập liệu và trạng thái form
+    matchForm.reset();
     document.getElementById('selectedWinner').value = "";
     document.getElementById('p1Name').value = "";
     document.getElementById('p2Name').value = "";
     document.getElementById('enableBan').checked = false;
     currentStage = 'ban';
     
-    // Reset giao diện
+    // Reset tiêu đề và thẻ tag đã chọn
+    document.getElementById('pickStageTitle').textContent = "Giai đoạn: Chọn Protocol (P1: 0/3 | P2: 0/3)";
+    document.getElementById('p1PickedTags').innerHTML = "";
+    document.getElementById('p2PickedTags').innerHTML = "";
+    
+    // Reset giao diện khung P1 / P2
     document.getElementById('p1Card').className = "bg-slate-800/50 p-4 rounded-lg border border-slate-700/50 transition-all";
     document.getElementById('p2Card').className = "bg-slate-800/50 p-4 rounded-lg border border-slate-700/50 transition-all";
     document.getElementById('btnWinP1').textContent = "P1 WIN";
     document.getElementById('btnWinP2').textContent = "P2 WIN";
     
-    document.getElementById('protocolCardGrid').classList.remove('hidden', 'opacity-50', 'pointer-events-none');
+    // Mở khóa lưới thẻ bài, hiện lại nút xác nhận và ẩn form nhập tên đi
+    const grid = document.getElementById('protocolCardGrid');
+    grid.classList.remove('hidden', 'opacity-50', 'pointer-events-none');
     document.getElementById('btnConfirmPick').classList.remove('hidden');
     document.getElementById('matchForm').classList.add('hidden');
     
