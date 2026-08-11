@@ -31,6 +31,13 @@
             <section class="bg-slate-900 border border-slate-800 rounded-xl p-4 sm:p-6 shadow-xl">
                 <h2 class="text-xl font-bold mb-4 text-emerald-400">NEW MATCH</h2>
 
+                <div class="bg-slate-800/40 p-3 rounded-lg border border-slate-700/50 mb-6">
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" id="enableBan" onchange="toggleBanMode()" class="w-4 h-4 text-emerald-600 rounded bg-slate-800 border-slate-700 focus:ring-emerald-500">
+                        <span class="text-sm font-bold text-amber-300">Áp dụng luật Ban Protocol</span>
+                    </label>
+                </div>
+
                 <!-- KHU VỰC CHỌN THẺ PROTOCOL -->
                 <div class="mb-6 bg-slate-950 p-4 rounded-xl border border-slate-800">
                     <div class="flex justify-between items-center mb-3">
@@ -371,7 +378,7 @@
                 }
                 document.getElementById('protocolCardGrid').classList.add('opacity-50', 'pointer-events-none');
                 document.getElementById('btnConfirmPick').classList.add('hidden');
-                document.getElementById('pickStageTitle').innerHTML = `✅ Đã khoá Protocol thành công!`;
+                document.getElementById('pickStageTitle ').innerHTML = `✅ Đã khoá Protocol thành công!`;
                 
                 document.getElementById('p1PickedTags').innerHTML = p1Picked.map(x => `<span class="bg-emerald-950/80 border border-emerald-700 px-2 py-0.5 rounded font-bold">${x}</span>`).join(' ');
                 document.getElementById('p2PickedTags').innerHTML = p2Picked.map(x => `<span class="bg-amber-950/80 border border-amber-700 px-2 py-0.5 rounded font-bold">${x}</span>`).join(' ');
@@ -516,36 +523,6 @@
             }
         }
 
-        function resetAllStates() {
-            p1Picked = [];
-            p2Picked = [];
-            bannedProtocols = [];
-            
-            // Đọc trạng thái checkbox luật Ban để quyết định đưa về Phase 1 hay Phase 2
-            const enableBan = document.getElementById('enableBan').checked;
-            currentStage = enableBan ? 'ban' : 'pick';
-            
-            const form = document.getElementById('matchForm');
-            form.reset();
-            document.getElementById('selectedWinner').value = "";
-            
-            document.getElementById('p1PickedTags').innerHTML = "";
-            document.getElementById('p2PickedTags').innerHTML = "";
-            
-            document.getElementById('p1Card').className = "bg-slate-800/50 p-4 rounded-lg border border-slate-700/50 transition-all";
-            document.getElementById('p2Card').className = "bg-slate-800/50 p-4 rounded-lg border border-slate-700/50 transition-all";
-            document.getElementById('btnWinP1').textContent = "P1 WIN";
-            document.getElementById('btnWinP2').textContent = "P2 WIN";
-            
-            // Mở khóa lưới thẻ bài, ẩn form nhập tên trận đấu đi
-            const grid = document.getElementById('protocolCardGrid');
-            grid.classList.remove('opacity-50', 'pointer-events-none');
-            document.getElementById('btnConfirmPick').classList.remove('hidden');
-            form.classList.add('hidden');
-            
-            renderProtocolGrid();
-        }
-
         const matchForm = document.getElementById('matchForm');
         matchForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -568,7 +545,27 @@
             saveDataToCloud();
             alert("Đã lưu trận đấu thành công lên Cloud!");
             
-            resetAllStates();
+            // --- XỬ LÝ RESET TOÀN BỘ GIAO DIỆN VỀ BAN ĐẦU ---
+            p1Picked = [];
+            p2Picked = [];
+            bannedProtocols = [];
+            currentStage = document.getElementById('enableBan').checked ? 'ban' : 'pick';
+            
+            matchForm.reset();
+            document.getElementById('selectedWinner').value = "";
+            document.getElementById('p1PickedTags').innerHTML = "";
+            document.getElementById('p2PickedTags').innerHTML = "";
+            
+            document.getElementById('p1Card').className = "bg-slate-800/50 p-4 rounded-lg border border-slate-700/50 transition-all";
+            document.getElementById('p2Card').className = "bg-slate-800/50 p-4 rounded-lg border border-slate-700/50 transition-all";
+            document.getElementById('btnWinP1').textContent = "P1 WIN";
+            document.getElementById('btnWinP2').textContent = "P2 WIN";
+            
+            document.getElementById('protocolCardGrid').classList.remove('opacity-50', 'pointer-events-none');
+            document.getElementById('btnConfirmPick').classList.remove('hidden');
+            matchForm.classList.add('hidden');
+            
+            renderProtocolGrid();
             renderApp();
         });
 
