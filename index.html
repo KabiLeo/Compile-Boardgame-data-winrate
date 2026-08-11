@@ -520,12 +520,14 @@
             p1Picked = [];
             p2Picked = [];
             bannedProtocols = [];
-            currentStage = 'ban';
+            
+            // Đọc trạng thái checkbox luật Ban để quyết định đưa về Phase 1 hay Phase 2
+            const enableBan = document.getElementById('enableBan').checked;
+            currentStage = enableBan ? 'ban' : 'pick';
             
             const form = document.getElementById('matchForm');
             form.reset();
             document.getElementById('selectedWinner').value = "";
-            document.getElementById('enableBan').checked = false;
             
             document.getElementById('p1PickedTags').innerHTML = "";
             document.getElementById('p2PickedTags').innerHTML = "";
@@ -535,8 +537,9 @@
             document.getElementById('btnWinP1').textContent = "P1 WIN";
             document.getElementById('btnWinP2').textContent = "P2 WIN";
             
+            // Mở khóa lưới thẻ bài, ẩn form nhập tên trận đấu đi
             const grid = document.getElementById('protocolCardGrid');
-            grid.classList.remove('hidden', 'opacity-50', 'pointer-events-none');
+            grid.classList.remove('opacity-50', 'pointer-events-none');
             document.getElementById('btnConfirmPick').classList.remove('hidden');
             form.classList.add('hidden');
             
