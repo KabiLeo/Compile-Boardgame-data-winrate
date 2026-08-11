@@ -524,39 +524,53 @@
         }
 
         const matchForm = document.getElementById('matchForm');
-        matchForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const winner = document.getElementById('selectedWinner').value;
-            if(!winner) {
-                alert("Vui lòng bấm chọn người chiến thắng trước khi lưu trận đấu!");
-                return;
-            }
+        function resetAllStates() {
+    p1Picked = [];
+    p2Picked = [];
+    bannedProtocols = [];
+    document.getElementById('selectedWinner').value = "";
+    document.getElementById('p1Name').value = "";
+    document.getElementById('p2Name').value = "";
+    document.getElementById('enableBan').checked = false;
+    currentStage = 'ban';
+    
+    // Reset giao diện
+    document.getElementById('p1Card').className = "bg-slate-800/50 p-4 rounded-lg border border-slate-700/50 transition-all";
+    document.getElementById('p2Card').className = "bg-slate-800/50 p-4 rounded-lg border border-slate-700/50 transition-all";
+    document.getElementById('btnWinP1').textContent = "P1 WIN";
+    document.getElementById('btnWinP2').textContent = "P2 WIN";
+    
+    document.getElementById('protocolCardGrid').classList.remove('hidden', 'opacity-50', 'pointer-events-none');
+    document.getElementById('btnConfirmPick').classList.remove('hidden');
+    document.getElementById('matchForm').classList.add('hidden');
+    
+    renderProtocolGrid();
+}
+matchForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const winner = document.getElementById('selectedWinner').value;
+    if(!winner) {
+        alert("Vui lòng bấm chọn người chiến thắng trước khi lưu trận đấu!");
+        return;
+    }
 
-            const newMatch = {
-                id: Date.now(),
-                p1Name: document.getElementById('p1Name').value.trim(),
-                p1Protocols: p1Picked,
-                p2Name: document.getElementById('p2Name').value.trim(),
-                p2Protocols: p2Picked,
-                winner: winner
-            };
+    const newMatch = {
+        id: Date.now(),
+        p1Name: document.getElementById('p1Name').value.trim(),
+        p1Protocols: p1Picked,
+        p2Name: document.getElementById('p2Name').value.trim(),
+        p2Protocols: p2Picked,
+        winner: winner
+    };
 
-            matches.push(newMatch);
-            saveDataToCloud();
-            
-            // Reset toàn bộ form sau khi lưu thành công
-            matchForm.reset();
-            document.getElementById('selectedWinner').value = "";
-            document.getElementById('p1Card').className = "bg-slate-800/50 p-4 rounded-lg border border-slate-700/50 transition-all";
-            document.getElementById('p2Card').className = "bg-slate-800/50 p-4 rounded-lg border border-slate-700/50 transition-all";
-            document.getElementById('btnWinP1').textContent = "P1 WIN";
-            document.getElementById('btnWinP2').textContent = "P2 WIN";
-
-            document.getElementById('enableBan').checked = false;
-            toggleBanMode();
-            renderApp();
-            alert("Đã lưu trận đấu thành công lên Cloud!");
-        });
+    matches.push(newMatch);
+    saveDataToCloud();
+    alert("Đã lưu trận đấu thành công lên Cloud!");
+    
+    // Gọi hàm reset toàn bộ trạng thái để quay về bước Ban/Pick
+    resetAllStates();
+    renderApp();
+});
 
         function deleteMatch(id) {
             if(confirm("Bạn có chắc chắn muốn xóa trận đấu này không?")) {
